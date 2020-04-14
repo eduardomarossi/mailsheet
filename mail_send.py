@@ -8,13 +8,15 @@ from email.message import Message
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.utils import formatdate, make_msgid
-from io import BytesIO, StringIO
+from io import BytesIO
 from pathlib import Path
 from email.mime.message import MIMEMessage
 from email.mime.text import MIMEText
 
 
-email_providers = {'outlook': {'host': 'smtp.office365.com', 'port': 587, 'use_tls': True}}
+email_providers = {'outlook': {'host': 'smtp.office365.com', 'port': 587, 'use_tls': True},
+                   'gmail': {'host': 'smtp.gmail.com', 'port': 587, 'use_tls': True}
+                  }
 
 
 class EmailBackend:
@@ -67,6 +69,7 @@ class EmailBackend:
 
         num_sent = 0
         for message in email_messages:
+            print('Sending mail to {}...'.format(message.to))
             sent = self._send(message)
             if sent:
                   num_sent += 1
@@ -302,22 +305,7 @@ class EmailMessage:
             msg[header] = value
 
     def __str__(self):
-        attributes = dir(self)
-        res = self.__class__.__name__ + "("
-        first = True
-        for attr in attributes:
-            if attr.startswith("__") and attr.endswith("__"):
-                continue
-
-            if (first):
-                first = False
-            else:
-                res += ", "
-
-            res += attr + " = " + str(getattr(self, attr))
-
-        res += ")"
-        return res
+        return '[subject={}, from={}, to={}, body={}]'.format(self.subject, self.from_email, self.to, self.body)
 
 
 class EmailMultiAlternatives(EmailMessage):
