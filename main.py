@@ -1,5 +1,5 @@
 # Author: Eduardo Marossi
-# Version: 1.0.1
+# Version: 1.0.2
 import argparse
 import logging
 import os
@@ -7,7 +7,7 @@ from gsheet import read_sheet, get_header_lines_number, get_header_columns, shee
 from mail_util import load_mail_credentials, find_mail_column_index, prepare_mails
 from mail_send import email_providers, EmailBackend, EmailMessage
 
-APP_VERSION = '1.0.1'
+APP_VERSION = '1.0.2'
 
 if __name__ == '__main__':
     argparse.ArgumentParser()
@@ -23,7 +23,8 @@ if __name__ == '__main__':
     parser.add_argument('--mail-credentials-path', type=str, default='mail_credentials.json', help='Custom path for mail credentials json file. Default: mail_credentials.json')
     parser.add_argument('--google-credentials-path', type=str, default='credentials.json', help='Custom path for google credentials json file. Default: credentials.json')
     parser.add_argument('-d', '--debug', default=False, action='store_true', help='Enable debug. Default: off')
-    parser.add_argument('--debug-force-to', default=None, type=str, help='Forces all e-mail to field to specified value.')
+    parser.add_argument('--debug-force-to', default=None, type=str, help='Forces all mail to field to specified value.')
+    parser.add_argument('-c', '--add-cc', default=[], action='append', help='Adds mail to cc field.')
     parser.add_argument('--debug-send-interval-start', default=None, type=int, help='Start sending mail after start interval')
     parser.add_argument('--debug-send-interval-end', default=None, type=int, help='End sending mail after end interval.')
     parser.add_argument('-v', '--verbose', default=False, action='store_true', help='Verbose output. Default: off')
@@ -71,6 +72,9 @@ if __name__ == '__main__':
     if args.debug_force_to is not None:
         for m in mails:
             m.to = [args.debug_force_to]
+
+    for m in mails:
+        m.cc.extend(args.add_cc)
 
     if args.debug_send_interval_start is not None and args.debug_send_interval_end is not None:
         mails = mails[args.debug_send_interval_start:args.debug_send_interval_end]
