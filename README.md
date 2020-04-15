@@ -1,6 +1,6 @@
 # mailgsheet - Sends data with your Google Sheet
 
-mailgsheet is an application that allows you to easily send multiple data extracted from a Google Sheet document for every e-mail in a user defined column.
+mailgsheet is an application that allows you to easily send row data extracted from a Google Sheet document for every e-mail in a user defined column.
 
 ## System Requeriments
 
