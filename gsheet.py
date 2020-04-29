@@ -1,5 +1,8 @@
 import os
 import pickle
+import re
+import sys
+import urllib
 from urllib.parse import urlparse
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -11,7 +14,7 @@ def sheet_id_from_url(url):
     return urlparse(url).path.split('/')[3]  # /spreadsheets/d/SHEET_ID/edit
 
 
-def read_sheet(credentials_path, sheet_id, sheet_range):
+def read_sheet(credentials_path, sheet_url, sheet_range, download_sheet=None):
     """
     Fetch Google Sheet values using specified range
     :param credentials_path: json file containing google credentials
@@ -19,6 +22,7 @@ def read_sheet(credentials_path, sheet_id, sheet_range):
     :param sheet_range: range in Sheet format (example A1:E3)
     :return: array / sheet values
     """
+    sheet_id = sheet_id_from_url(sheet_url)
     # Source: https://developers.google.com/sheets/api/quickstart/python
     creds = None
     SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
@@ -46,7 +50,6 @@ def read_sheet(credentials_path, sheet_id, sheet_range):
             pickle.dump(creds, token)
 
     service = build('sheets', 'v4', credentials=creds, cache_discovery=False)
-
     # Call the Sheets API
     sheet = service.spreadsheets()
     logging.info('Fetching spreadsheet data')
@@ -54,6 +57,20 @@ def read_sheet(credentials_path, sheet_id, sheet_range):
                                 range=sheet_range).execute()
     values = result.get('values', [])
     logging.debug(values)
+
+    if download_sheet is not None:
+        from google.auth.transport.requests import AuthorizedSession
+
+        authed_session = AuthorizedSession(creds)
+        exportUrl = sheet_url.replace('edit', 'export')
+
+        url = exportUrl
+
+        response = authed_session.request(
+            'GET', url)
+        with open(download_sheet, 'wb') as csvFile:
+            csvFile.write(response.content)
+
     return values
 
 
