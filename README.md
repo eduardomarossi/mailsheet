@@ -1,6 +1,6 @@
-# mailgsheet - Sends data with your Google Sheet
+# mailsheet - Sends data with your Google Sheet / Excel sheet
 
-mailgsheet is an application that allows you to easily send row data extracted from a Google Sheet document for every e-mail in a user defined column.
+mailgsheet is an application that allows you to easily send row data extracted from a Google Sheet / Excel document for every e-mail in a user defined column.
 
 ## System Requeriments
 
@@ -8,8 +8,10 @@ mailgsheet is an application that allows you to easily send row data extracted f
 
 ## Quick Start
 
+### For Google Docs access
 - [Enable Google Sheets API access](https://developers.google.com/sheets/api/quickstart/python) and download credentials (credentials.json) and put on same folder
 
+### Authenticate your mail provider
 - [Fill up mail_credentials_example.json](https://github.com/eduardomarossi/mailgsheet/blob/master/mail_credentials_example.json) and rename to mail_credentials.json in same folder
 
 - Use cases:
