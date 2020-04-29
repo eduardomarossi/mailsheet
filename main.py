@@ -1,6 +1,6 @@
 # Author: Eduardo Marossi
 # Version: 1.1.0
-# import argparse
+import argparse
 import logging
 import os
 from tempfile import mkstemp
