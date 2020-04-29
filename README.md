@@ -24,9 +24,10 @@ mailgsheet is an application that allows you to easily send row data extracted f
 
 | Parameter | Description | Example |
 | --------  | ------------ | ------- |
-| sheet_url | Google Sheet URL | http://sheets/d/XXXXXXXXXXXX/edit?usp=sharing
+| sheet_url | Google Sheet URL or Excel file path (xlsx) | http://sheets/d/XXXXXXXXXXXX/edit?usp=sharing
 | sheet_name | Sheet name | Page1 |
 | sheet_range | Range where all data is contained | A:N - A column to N (all rows)
+| --sends-as-file | Sends an Excel sheet per row as attachment with only the row kept (and formatting) | 
 | --header-lines | Specify line number where header is contained | 1-3 or 1 |
 | --rows-start | Specify where the table data starts (default: line after header) | 4
 | --mail-column | Name of the column where e-mails are stored (one per row) | Mail
