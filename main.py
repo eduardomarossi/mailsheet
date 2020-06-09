@@ -1,6 +1,6 @@
 # Author: Eduardo Marossi
 # Version: 1.1.0
-# import argparse
+import argparse
 import logging
 import os
 from tempfile import mkstemp
@@ -32,7 +32,7 @@ if __name__ == '__main__':
     parser.add_argument('--debug-send-interval-start', default=None, type=int, help='Start sending mail after start interval')
     parser.add_argument('--debug-send-interval-end', default=None, type=int, help='End sending mail after end interval.')
     parser.add_argument('-v', '--verbose', default=False, action='store_true', help='Verbose output. Default: off')
-    parser.add_argument('--sends-as-file', default=False, action='store_true', help='Sends resulting sheet with header and row data. Recommended if you want tot preserve formattting.')
+    parser.add_argument('--sends-as-file', default=True, action='store_true', help='Sends resulting sheet with header and row data. Recommended if you want tot preserve formattting.')
     args = parser.parse_args()
 
     if args.debug:

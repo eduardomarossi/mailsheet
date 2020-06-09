@@ -43,8 +43,8 @@ def prepare_mails(header, data, mail_column, mail_subject, mail_template, mail_u
 
 def prepare_mail(header, row_data, mail_subject, mail_template, mail_username, mail_to, symbols, mail_attach=None):
     data = ''
-    for k, v in header.items():
-        data += '{}: {}<br/>'.format(v, row_data[k])
+    #for k, v in header.items():
+        #data += '{}: {}<br/>'.format(v, row_data[k])
     symbols['{data}'] = data
 
     subject = symbols_replace(mail_subject, symbols)
