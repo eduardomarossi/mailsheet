@@ -16,7 +16,7 @@ def symbols_replace(template, symbols):
     return o
 
 
-def prepare_mails(header, data, mail_column, mail_subject, mail_template, mail_username, symbols, file_path=None, data_start=None, sheet_name=None):
+def prepare_mails(header, data, mail_column, mail_subject, mail_template, mail_username, file_path=None, data_start=None, sheet_name=None):
     mails = []
 
     dir_path = ''
@@ -36,15 +36,14 @@ def prepare_mails(header, data, mail_column, mail_subject, mail_template, mail_u
             mail_attach = os.path.join(dir_path, starting_name + '.xlsx')
             open_sheet_keep_row(file_path, mail_attach, sheet_name, data_start, l)
 
-        mail = prepare_mail(header, data[l], mail_subject, mail_template, mail_username, mail_to, symbols, mail_attach)
+        mail = prepare_mail(header, data[l], mail_subject, mail_template, mail_username, mail_to, mail_attach)
         mails.append(mail)
     return mails
 
 
-def prepare_mail(header, row_data, mail_subject, mail_template, mail_username, mail_to, symbols, mail_attach=None):
+def prepare_mail(header, row_data, mail_subject, mail_template, mail_username, mail_to, mail_attach=None):
     data = ''
-    #for k, v in header.items():
-        #data += '{}: {}<br/>'.format(v, row_data[k])
+    symbols = {}
     symbols['{data}'] = data
 
     subject = symbols_replace(mail_subject, symbols)

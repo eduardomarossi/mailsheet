@@ -67,7 +67,6 @@ if __name__ == '__main__':
         file_path = args.sheet_url
         data = excel.read_sheet(args.sheet_url, args.sheet_name, args.sheet_range)
 
-
     headers = get_header_columns(data, args.header_lines)
 
     print('\nHeader columns found: ', end='')
@@ -79,13 +78,12 @@ if __name__ == '__main__':
 
     mail_index = find_mail_column_index(headers, mail_column)
 
-    symbols = {}
 
     if args.sends_as_file:
         mails = prepare_mails(headers, data[args.rows_start:], mail_index, mail_credentials['subject'],
-                              mail_credentials['message'], mail_credentials['username'], symbols, file_path, args.rows_start+1, args.sheet_name)
+                              mail_credentials['message'], mail_credentials['username'], file_path, args.rows_start+1, args.sheet_name)
     else:
-        mails = prepare_mails(headers, data[args.rows_start:], mail_index, mail_credentials['subject'], mail_credentials['message'], mail_credentials['username'], symbols)
+        mails = prepare_mails(headers, data[args.rows_start:], mail_index, mail_credentials['subject'], mail_credentials['message'], mail_credentials['username'])
 
     sender = EmailBackend(username=mail_credentials['username'], password=mail_credentials['app_password'], **email_providers[mail_credentials['provider']])
 
