@@ -68,6 +68,7 @@ def read_sheet(credentials_path, sheet_url, sheet_range, download_sheet=None):
 
         response = authed_session.request(
             'GET', url)
+
         with open(download_sheet, 'wb') as csvFile:
             csvFile.write(response.content)
 
