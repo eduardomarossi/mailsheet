@@ -1,0 +1,20 @@
+sheet:
+  url: https://docs.google.com/spreadsheets/d/1R8KWtQPIk7wVj0otVp4WwH4QubwyVHRPlzVuLdkM_Jg/edit
+  name: AV3
+  header-rows: 1
+  start-row: 1
+  email-col: 3
+  range: A1:Z48
+
+email:
+  subject: "Computacao Embarcada: Feedback AV3."
+  cc: corsiferrao@gmail.com; corsiferrao2@gmail.com
+  msg: |
+    Prezadxs, segue em anexo feedback da terceira
+    avaliação individual de Computação Embarcada.
+
+    Dúvidas? Erros? Comentários? Responda esse email.
+
+    att,
+
+    Corsi

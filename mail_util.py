@@ -7,7 +7,7 @@ from tempfile import mkstemp
 
 from excel import open_sheet_keep_row
 from mail_send import EmailMessage
-
+import markdown2
 
 def symbols_replace(template, symbols):
     o = template
@@ -15,8 +15,12 @@ def symbols_replace(template, symbols):
         o = o.replace(k, v)
     return o
 
+# https://stackoverflow.com/questions/4528982/convert-alphabet-letters-to-number-in-python
+def letter_num(char):
+    return(char)
+    return ([ord(char) - 96 for char in char.lower()] - 1)
 
-def prepare_mails(header, data, mail_column, mail_subject, mail_template, mail_username, symbols, file_path=None, data_start=None, sheet_name=None):
+def prepare_mails(data, config, credentials, file_path=None):
     mails = []
 
     dir_path = ''
@@ -27,29 +31,28 @@ def prepare_mails(header, data, mail_column, mail_subject, mail_template, mail_u
             os.mkdir(dir_path)
 
     for l in range(0, len(data)):
-        mail_to = data[l][mail_column]
+        mail_to = data[l][config["sheet"]["email-col"] - 1]
         mail_attach = None
 
         if file_path is not None:
             now = datetime.now()
             starting_name = mail_to[:mail_to.find('@')] + '-{}-{}'.format(now.second, now.microsecond)
             mail_attach = os.path.join(dir_path, starting_name + '.xlsx')
-            open_sheet_keep_row(file_path, mail_attach, sheet_name, data_start, l)
+            open_sheet_keep_row(file_path, mail_attach,  config["sheet"]["name"], config["sheet"]["start-row"]+1, l)
 
-        mail = prepare_mail(header, data[l], mail_subject, mail_template, mail_username, mail_to, symbols, mail_attach)
+        mail = prepare_mail(config["email"]["subject"], config["email"]["msg"], credentials['username'], mail_to, mail_attach)
         mails.append(mail)
     return mails
 
 
-def prepare_mail(header, row_data, mail_subject, mail_template, mail_username, mail_to, symbols, mail_attach=None):
+def prepare_mail(mail_subject, mail_msg, mail_username, mail_to, mail_attach=None):
     data = ''
-    #for k, v in header.items():
-        #data += '{}: {}<br/>'.format(v, row_data[k])
+    symbols = {}
     symbols['{data}'] = data
 
     subject = symbols_replace(mail_subject, symbols)
     username = symbols_replace(mail_username, symbols)
-    message = symbols_replace(mail_template, symbols)
+    message = symbols_replace(markdown2.markdown(mail_msg), symbols)
     to = symbols_replace(mail_to, symbols)
 
     mail = EmailMessage(subject, message, username, [to])
