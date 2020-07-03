@@ -7,7 +7,7 @@ from tempfile import mkstemp
 
 import excel
 from gsheet import read_sheet, get_header_lines_number, get_header_columns, sheet_id_from_url
-from mail_util import load_mail_credentials, find_mail_column_index, prepare_mails
+from mail_util import load_mail_credentials, find_mail_column_index, prepare_mails, format_google_url
 from mail_send import email_providers, EmailBackend
 import yaml
 
@@ -40,6 +40,7 @@ if __name__ == '__main__':
 
     with open('config.yml', 'r') as file:
         config = yaml.load(file, Loader=yaml.FullLoader)
+    config['sheet']['url'] = format_google_url(config['sheet']['url'])
 
     mail_credentials = load_mail_credentials(args.mail_credentials_path)
 
@@ -48,7 +49,7 @@ if __name__ == '__main__':
         if args.sends_as_file:
             handle, file_path = mkstemp(suffix='.xlsx')
             os.close(handle)
-        data = read_sheet(args.google_credentials_path, config["sheet"]["url"], '{}!{}'.format(config["sheet"]["name"], config["sheet"]["range"]), file_path)
+        data = read_sheet(args.google_credentials_path,  config["sheet"]["url"], '{}!{}'.format(config["sheet"]["name"], config["sheet"]["range"]), file_path)
         print('Google Docs temp file: {}'.format(file_path))
     else:
         file_path = config["sheet"]["url"]

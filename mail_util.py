@@ -20,6 +20,9 @@ def letter_num(char):
     return(char)
     return ([ord(char) - 96 for char in char.lower()] - 1)
 
+def format_google_url(url):
+    return(url.split('edit')[0]+'edit')
+
 def prepare_mails(data, config, credentials, file_path=None):
     mails = []
 
