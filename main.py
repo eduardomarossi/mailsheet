@@ -18,8 +18,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog='mailsheet {}'.format(APP_VERSION),
                                      description='Sends email for every row in a Excel or Google Sheet')
     parser.add_argument('--dry-run', default=False, action='store_true', help='Do not send mail. Show results')
-    parser.add_argument('--mail-credentials-path', type=str, default='mail_credentials.json', help='Custom path for mail credentials json file. Default: mail_credentials.json')
-    parser.add_argument('--google-credentials-path', type=str, default='credentials.json', help='Custom path for google credentials json file. Default: credentials.json')
     parser.add_argument('-d', '--debug', default=False, action='store_true', help='Enable debug. Default: off')
     parser.add_argument('--debug-force-to', default=None, type=str, help='Forces all mail to field to specified value.')
     parser.add_argument('-c', '--add-cc', default=[], action='append', help='Adds mail to cc field.')
@@ -32,24 +30,21 @@ if __name__ == '__main__':
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
 
-    if not os.path.exists(args.mail_credentials_path):
-        raise FileNotFoundError('Missing mail credentials file')
-
-    if not os.path.exists(args.google_credentials_path):
-        raise FileNotFoundError('Missing google credentials file')
+    mail_credentials_path = 'mail_credentials.json'
+    google_credentials_path = 'google_credentials.json'
 
     with open('config.yml', 'r') as file:
         config = yaml.load(file, Loader=yaml.FullLoader)
     config['sheet']['url'] = format_google_url(config['sheet']['url'])
 
-    mail_credentials = load_mail_credentials(args.mail_credentials_path)
+    mail_credentials = load_mail_credentials(mail_credentials_path)
 
     file_path = None
     if 'google.com' in config["sheet"]["url"]:
         if args.sends_as_file:
             handle, file_path = mkstemp(suffix='.xlsx')
             os.close(handle)
-        data = read_sheet(args.google_credentials_path,  config["sheet"]["url"], '{}!{}'.format(config["sheet"]["name"], config["sheet"]["range"]), file_path)
+        data = read_sheet(google_credentials_path, config["sheet"]["url"], '{}!{}'.format(config["sheet"]["name"], config["sheet"]["range"]), file_path)
         print('Google Docs temp file: {}'.format(file_path))
     else:
         file_path = config["sheet"]["url"]
