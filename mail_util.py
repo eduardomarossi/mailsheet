@@ -56,8 +56,9 @@ def prepare_mail(mail_subject, mail_msg, mail_username, mail_to, mail_attach=Non
     subject = symbols_replace(mail_subject, symbols)
     username = symbols_replace(mail_username, symbols)
     message = symbols_replace(markdown2.markdown(mail_msg), symbols)
-    to = symbols_replace(mail_to, symbols)
-
+    to = symbols_replace(mail_to, symbols).split(';')
+    to = [x.strip() for x in to]
+    print(to)
     mail = EmailMessage(subject, message, username, [to])
     mail.content_subtype = "html"
     if mail_attach is not None:
