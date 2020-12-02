@@ -17,9 +17,8 @@ if __name__ == '__main__':
     argparse.ArgumentParser()
     parser = argparse.ArgumentParser(prog='mailsheet {}'.format(APP_VERSION),
                                      description='Sends email for every row in a Excel or Google Sheet')
+    parser.add_argument('--config', default=None,  type=str, help='Config file')
     parser.add_argument('--dry-run', default=False, action='store_true', help='Do not send mail. Show results')
-    parser.add_argument('--mail-credentials-path', type=str, default='mail_credentials.json', help='Custom path for mail credentials json file. Default: mail_credentials.json')
-    parser.add_argument('--google-credentials-path', type=str, default='credentials.json', help='Custom path for google credentials json file. Default: credentials.json')
     parser.add_argument('-d', '--debug', default=False, action='store_true', help='Enable debug. Default: off')
     parser.add_argument('--debug-force-to', default=None, type=str, help='Forces all mail to field to specified value.')
     parser.add_argument('-c', '--add-cc', default=[], action='append', help='Adds mail to cc field.')
@@ -32,31 +31,33 @@ if __name__ == '__main__':
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
 
-    if not os.path.exists(args.mail_credentials_path):
-        raise FileNotFoundError('Missing mail credentials file')
+    mail_credentials_path = 'mail_credentials.json'
+    google_credentials_path = 'google_credentials.json'
 
-    if not os.path.exists(args.google_credentials_path):
-        raise FileNotFoundError('Missing google credentials file')
+    if args.config:
+        config_file = args.config
+    else:
+        config_file = 'config.yml'
 
-    with open('config.yml', 'r') as file:
+    with open(config_file, 'r') as file:
         config = yaml.load(file, Loader=yaml.FullLoader)
     config['sheet']['url'] = format_google_url(config['sheet']['url'])
 
-    mail_credentials = load_mail_credentials(args.mail_credentials_path)
+    mail_credentials = load_mail_credentials(mail_credentials_path)
 
     file_path = None
     if 'google.com' in config["sheet"]["url"]:
         if args.sends_as_file:
             handle, file_path = mkstemp(suffix='.xlsx')
             os.close(handle)
-        data = read_sheet(args.google_credentials_path,  config["sheet"]["url"], '{}!{}'.format(config["sheet"]["name"], config["sheet"]["range"]), file_path)
+        data = read_sheet(google_credentials_path, config["sheet"]["url"], '{}!{}'.format(config["sheet"]["name"], config["sheet"]["range"]), file_path)
         print('Google Docs temp file: {}'.format(file_path))
     else:
         file_path = config["sheet"]["url"]
         data = excel.read_sheet(config["sheet"]["url"], config["sheet"]["name"], config["sheet"]["range"])
 
     if args.sends_as_file:
-        mails = prepare_mails(data[config["sheet"]["start-row"]:], config, mail_credentials, file_path)
+        mails = prepare_mails(data[config["sheet"]["header-rows"]:], config, mail_credentials, file_path)
     else:
         mails = prepare_mails(data[config["sheet"]["start-row"]:], mail_index, config["email"]['subject'], mail_credentials['message'], mail_credentials['username'])
 
@@ -67,7 +68,8 @@ if __name__ == '__main__':
             m.to = [args.debug_force_to]
 
     for m in mails:
-        m.cc.extend([x.strip() for x in config["email"]["cc"].split(';')])
+        if len(m.cc) > 0:
+            m.cc.extend([x.strip() for x in config["email"]["cc"].split(';')])
 
     if args.debug_send_interval_start is not None and args.debug_send_interval_end is not None:
         mails = mails[args.debug_send_interval_start:args.debug_send_interval_end]
