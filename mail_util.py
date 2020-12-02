@@ -41,7 +41,7 @@ def prepare_mails(data, config, credentials, file_path=None):
             now = datetime.now()
             starting_name = mail_to[:mail_to.find('@')] + '-{}-{}'.format(now.second, now.microsecond)
             mail_attach = os.path.join(dir_path, starting_name + '.xlsx')
-            open_sheet_keep_row(file_path, mail_attach,  config["sheet"]["name"], config["sheet"]["start-row"]+1, l)
+            open_sheet_keep_row(file_path, mail_attach, config["sheet"]["name"], config["sheet"]["header-rows"] + config["sheet"]["start-row"], l)
 
         mail = prepare_mail(config["email"]["subject"], config["email"]["msg"], credentials['username'], mail_to, mail_attach)
         mails.append(mail)
@@ -58,8 +58,7 @@ def prepare_mail(mail_subject, mail_msg, mail_username, mail_to, mail_attach=Non
     message = symbols_replace(markdown2.markdown(mail_msg), symbols)
     to = symbols_replace(mail_to, symbols).split(';')
     to = [x.strip() for x in to]
-    print(to)
-    mail = EmailMessage(subject, message, username, [to])
+    mail = EmailMessage(subject, message, username, to)
     mail.content_subtype = "html"
     if mail_attach is not None:
         mail.attach_file(mail_attach, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')

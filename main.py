@@ -17,6 +17,7 @@ if __name__ == '__main__':
     argparse.ArgumentParser()
     parser = argparse.ArgumentParser(prog='mailsheet {}'.format(APP_VERSION),
                                      description='Sends email for every row in a Excel or Google Sheet')
+    parser.add_argument('--config', default=None,  type=str, help='Config file')
     parser.add_argument('--dry-run', default=False, action='store_true', help='Do not send mail. Show results')
     parser.add_argument('-d', '--debug', default=False, action='store_true', help='Enable debug. Default: off')
     parser.add_argument('--debug-force-to', default=None, type=str, help='Forces all mail to field to specified value.')
@@ -33,7 +34,12 @@ if __name__ == '__main__':
     mail_credentials_path = 'mail_credentials.json'
     google_credentials_path = 'google_credentials.json'
 
-    with open('config.yml', 'r') as file:
+    if args.config:
+        config_file = args.config
+    else:
+        config_file = 'config.yml'
+
+    with open(config_file, 'r') as file:
         config = yaml.load(file, Loader=yaml.FullLoader)
     config['sheet']['url'] = format_google_url(config['sheet']['url'])
 
@@ -51,7 +57,7 @@ if __name__ == '__main__':
         data = excel.read_sheet(config["sheet"]["url"], config["sheet"]["name"], config["sheet"]["range"])
 
     if args.sends_as_file:
-        mails = prepare_mails(data[config["sheet"]["start-row"]:], config, mail_credentials, file_path)
+        mails = prepare_mails(data[config["sheet"]["header-rows"]:], config, mail_credentials, file_path)
     else:
         mails = prepare_mails(data[config["sheet"]["start-row"]:], mail_index, config["email"]['subject'], mail_credentials['message'], mail_credentials['username'])
 
@@ -62,7 +68,8 @@ if __name__ == '__main__':
             m.to = [args.debug_force_to]
 
     for m in mails:
-        m.cc.extend([x.strip() for x in config["email"]["cc"].split(';')])
+        if len(m.cc) > 0:
+            m.cc.extend([x.strip() for x in config["email"]["cc"].split(';')])
 
     if args.debug_send_interval_start is not None and args.debug_send_interval_end is not None:
         mails = mails[args.debug_send_interval_start:args.debug_send_interval_end]
