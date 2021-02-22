@@ -74,7 +74,7 @@ def load_mail_credentials(path):
     with open(path) as f:
         data = json.loads(f.read())
 
-    required = ['provider', 'username', 'app_password', 'message']
+    required = ['provider', 'username', 'app_password']
     for k in required:
         if k not in data:
             raise ArgumentError('Missing required information in mail_credentials json file.')
