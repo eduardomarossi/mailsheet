@@ -21,7 +21,6 @@ if __name__ == '__main__':
     parser.add_argument('--dry-run', default=False, action='store_true', help='Do not send mail. Show results')
     parser.add_argument('-d', '--debug', default=False, action='store_true', help='Enable debug. Default: off')
     parser.add_argument('--debug-force-to', default=None, type=str, help='Forces all mail to field to specified value.')
-    parser.add_argument('-c', '--add-cc', default=[], action='append', help='Adds mail to cc field.')
     parser.add_argument('--debug-send-interval-start', default=None, type=int, help='Start sending mail after start interval')
     parser.add_argument('--debug-send-interval-end', default=None, type=int, help='End sending mail after end interval.')
     parser.add_argument('-v', '--verbose', default=False, action='store_true', help='Verbose output. Default: off')
@@ -68,7 +67,7 @@ if __name__ == '__main__':
             m.to = [args.debug_force_to]
 
     for m in mails:
-        if len(m.cc) > 0:
+        if config['email']['cc'] is not None:
             m.cc.extend([x.strip() for x in config["email"]["cc"].split(';')])
 
     if args.debug_send_interval_start is not None and args.debug_send_interval_end is not None:

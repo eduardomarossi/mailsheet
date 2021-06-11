@@ -31,7 +31,7 @@ def get_ranges(sheet_range):
 
 
 def read_sheet(file_path, sheet_name, sheet_range):
-    wb = load_workbook(filename=file_path)
+    wb = load_workbook(filename=file_path, data_only=True)
     ws = wb[sheet_name]
     min_col, max_col, min_row, max_row = get_ranges(sheet_range)
     cells = ws.iter_rows(min_col=min_col, max_col=max_col, min_row=min_row, max_row=max_row)
